@@ -97,11 +97,11 @@ $fetch_contact_response_obj = json_decode($fetch_contact_response);
 
 // On récupère l'ID du premier contact pour récupérer ses tickets liés 
 if(!empty($fetch_contact_response_obj->records)) $first_contact_id = $fetch_contact_response_obj->records[0]->id;
-
+else return 0;
 
 
 // Récupération des tickets du premier contact avec la méthode GET 
-$fetch_cases_url = $instance_url . "/Contacts/${first_contact_id}/link/cases/filter";
+$fetch_cases_url = $instance_url . "/Contacts/$first_contact_id/link/cases/filter";
 $cases_filter_arguments = array(
     "filter" => array(
         array(
@@ -136,4 +136,41 @@ curl_close($fetch_cases_request);
 
 //decode json
 $fetch_cases_response_obj = json_decode($fetch_cases_response);
-print_r($fetch_cases_response);
+// print_r($fetch_cases_response);
+
+
+// Ajout d'un ticket au contact
+$post_case_url = $instance_url . "/Contacts/$first_contact_id/link/cases";
+
+$post_case_arguments = array(
+    "name" => "NEW TEST 7",
+    "description" => "test description",
+    "type" => "Administration",
+    "status" => "New",
+);
+
+$post_case_request = curl_init($post_case_url);
+curl_setopt($post_case_request, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
+curl_setopt($post_case_request, CURLOPT_HEADER, false);
+curl_setopt($post_case_request, CURLOPT_SSL_VERIFYPEER, 0);
+curl_setopt($post_case_request, CURLOPT_RETURNTRANSFER, 1);
+curl_setopt($post_case_request, CURLOPT_FOLLOWLOCATION, 0);
+curl_setopt($post_case_request, CURLOPT_HTTPHEADER, array(
+    "Content-Type: application/json",
+    "oauth-token: {$oauth_token}"
+));
+
+//convert arguments to json
+$json_arguments = json_encode($post_case_arguments);
+curl_setopt($post_case_request, CURLOPT_POSTFIELDS, $json_arguments);
+
+//execution de la request
+if( ! $post_case_response = curl_exec($post_case_request))
+{
+    trigger_error(curl_error($post_case_request));
+}
+curl_close($post_case_request);
+
+//decode json
+$post_case_response_obj = json_decode($post_case_response);
+print_r($post_case_response);
