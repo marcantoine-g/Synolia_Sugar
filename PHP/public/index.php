@@ -1,8 +1,10 @@
 <?php
-require 'tools.php';
+require '../tools.php';
+require_once __DIR__.'/../vendor/autoload.php';
 
-$username = "melissa";
-$password = "qVKbo6obKxDVbVvVfJ5EN5i529Lfkmf7W7MA";
+// Chargement du fichier .env
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__.'/../');
+$dotenv->load();
 $tools = new Tools();
 
 ### LOGIN [POST]
@@ -11,8 +13,8 @@ $oauth2_token_arguments = array(
     "grant_type" => "password",
     "client_id" => "sugar", 
     "client_secret" => "",
-    "username" => $username,
-    "password" => $password,
+    "username" => $_ENV['APP_USERNAME'],
+    "password" => $_ENV['APP_PASSWORD'],
     "platform" => "base" 
 );
 
@@ -86,4 +88,4 @@ $post_case_arguments = array(
 
 // Appel API
 $new_ticket = $tools->makeRequest("/Contacts/$first_contact_id/link/cases", $post_case_arguments);
-// print_r($new_ticket);
+print_r($new_ticket);
